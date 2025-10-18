@@ -1,0 +1,33 @@
+# TradingAgents Quick Commands for ZSH
+# Source this file or add to your ~/.zshrc
+
+# Navigate to TradingAgents and activate venv
+alias ta="cd /Users/omarsabbah/Desktop/TradingAgents && source venv/bin/activate"
+
+# Backtest commands
+alias ta-backtest="python -m cli.main backtest run"
+alias ta-compare="python -m cli.main backtest compare"
+alias ta-help="python -m cli.main backtest --help"
+
+# Example scripts
+alias ta-simple="python examples/simple_backtest.py"
+alias ta-portfolio="python examples/portfolio_backtest.py"
+alias ta-advanced="python examples/advanced_backtest.py"
+
+# Regular analysis
+alias ta-analyze="python -m cli.main analyze"
+
+# Quick start message
+alias ta-start='echo "TradingAgents Commands:
+  ta              - Navigate and activate
+  ta-backtest     - Run interactive backtest
+  ta-compare      - Compare multiple tickers
+  ta-simple       - Run simple example
+  ta-portfolio    - Run portfolio example
+  ta-advanced     - Run advanced example
+  ta-analyze      - Run regular analysis
+  ta-help         - Show backtest help
+"'
+
+echo "✅ TradingAgents aliases loaded! Type 'ta-start' for commands."
+

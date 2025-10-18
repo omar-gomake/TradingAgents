@@ -37,6 +37,13 @@ app = typer.Typer(
     add_completion=True,  # Enable shell completion
 )
 
+# Add backtesting subcommand
+try:
+    from cli.backtest import app as backtest_app
+    app.add_typer(backtest_app, name="backtest", help="Backtesting commands")
+except ImportError:
+    pass  # Backtest module not available
+
 
 # Create a deque to store recent messages with a maximum length
 class MessageBuffer:

@@ -25,7 +25,7 @@
 
 ---
 
-# TradingAgents: Multi-Agents LLM Financial Trading Framework 
+# TradingAgents: Multi-Agents LLM Financial Trading Framework
 
 > 🎉 **TradingAgents** officially released! We have received numerous inquiries about the work, and we would like to express our thanks for the enthusiasm in our community.
 >
@@ -60,6 +60,7 @@ TradingAgents is a multi-agent trading framework that mirrors the dynamics of re
 Our framework decomposes complex trading tasks into specialized roles. This ensures the system achieves a robust, scalable approach to market analysis and decision-making.
 
 ### Analyst Team
+
 - Fundamentals Analyst: Evaluates company financials and performance metrics, identifying intrinsic values and potential red flags.
 - Sentiment Analyst: Analyzes social media and public sentiment using sentiment scoring algorithms to gauge short-term market mood.
 - News Analyst: Monitors global news and macroeconomic indicators, interpreting the impact of events on market conditions.
@@ -70,6 +71,7 @@ Our framework decomposes complex trading tasks into specialized roles. This ensu
 </p>
 
 ### Researcher Team
+
 - Comprises both bullish and bearish researchers who critically assess the insights provided by the Analyst Team. Through structured debates, they balance potential gains against inherent risks.
 
 <p align="center">
@@ -77,6 +79,7 @@ Our framework decomposes complex trading tasks into specialized roles. This ensu
 </p>
 
 ### Trader Agent
+
 - Composes reports from the analysts and researchers to make informed trading decisions. It determines the timing and magnitude of trades based on comprehensive market insights.
 
 <p align="center">
@@ -84,6 +87,7 @@ Our framework decomposes complex trading tasks into specialized roles. This ensu
 </p>
 
 ### Risk Management and Portfolio Manager
+
 - Continuously evaluates portfolio risk by assessing market volatility, liquidity, and other risk factors. The risk management team evaluates and adjusts trading strategies, providing assessment reports to the Portfolio Manager for final decision.
 - The Portfolio Manager approves/rejects the transaction proposal. If approved, the order will be sent to the simulated exchange and executed.
 
@@ -96,18 +100,21 @@ Our framework decomposes complex trading tasks into specialized roles. This ensu
 ### Installation
 
 Clone TradingAgents:
+
 ```bash
 git clone https://github.com/TauricResearch/TradingAgents.git
 cd TradingAgents
 ```
 
 Create a virtual environment in any of your favorite environment managers:
+
 ```bash
 conda create -n tradingagents python=3.13
 conda activate tradingagents
 ```
 
 Install dependencies:
+
 ```bash
 pip install -r requirements.txt
 ```
@@ -122,6 +129,7 @@ export ALPHA_VANTAGE_API_KEY=$YOUR_ALPHA_VANTAGE_API_KEY
 ```
 
 Alternatively, you can create a `.env` file in the project root with your API keys (see `.env.example` for reference):
+
 ```bash
 cp .env.example .env
 # Edit .env with your actual API keys
@@ -132,9 +140,11 @@ cp .env.example .env
 ### CLI Usage
 
 You can also try out the CLI directly by running:
+
 ```bash
 python -m cli.main
 ```
+
 You will see a screen where you can select your desired tickers, date, LLMs, research depth, etc.
 
 <p align="center">
@@ -204,22 +214,158 @@ print(decision)
 
 You can view the full list of configurations in `tradingagents/default_config.py`.
 
+## Backtesting Framework
+
+TradingAgents now includes a comprehensive backtesting framework that allows you to test your trading strategies over historical periods with realistic trading constraints, performance metrics, and agent learning capabilities.
+
+### Quick Start Backtesting
+
+The easiest way to run a backtest is using the CLI:
+
+```bash
+# Interactive mode with guided prompts
+python -m cli.main backtest run
+
+# Or specify parameters directly
+python -m cli.main backtest run -t AAPL -s 2023-01-01 -e 2024-01-01 -c 100000
+```
+
+### Python Backtesting API
+
+For more control, use the Python API:
+
+```python
+from tradingagents.backtesting import BacktestEngine, BacktestConfig
+from tradingagents.default_config import DEFAULT_CONFIG
+
+# Configure backtesting parameters
+config = BacktestConfig(
+    initial_cash=100000.0,
+    commission=0.001,  # 0.1% commission
+    position_sizing="percentage",
+    position_size_value=0.95,  # Use 95% of portfolio
+    stop_loss=0.10,  # 10% stop loss
+    take_profit=0.20,  # 20% take profit
+    enable_reflection=True,  # Enable agent learning
+)
+
+# Create and run backtest
+engine = BacktestEngine(
+    ticker="AAPL",
+    start_date="2023-01-01",
+    end_date="2024-01-01",
+    initial_cash=100000,
+    config=config,
+    selected_analysts=["market", "news", "fundamentals"],
+)
+
+results = engine.run()
+
+# Print comprehensive metrics
+results.print_metrics()
+
+# Save results and generate visualizations
+engine.save_results("results/backtests/AAPL")
+engine.plot("results/backtests/AAPL/plots")
+```
+
+### Multi-Ticker Portfolio Backtesting
+
+Test strategies across multiple stocks simultaneously:
+
+```python
+from tradingagents.backtesting import MultiTickerBacktestEngine
+
+engine = MultiTickerBacktestEngine(
+    tickers=["AAPL", "GOOGL", "MSFT"],
+    start_date="2023-01-01",
+    end_date="2024-01-01",
+    initial_cash=300000,  # Total portfolio capital
+)
+
+results = engine.run()
+engine.save_all_results("results/backtests/portfolio")
+```
+
+### Key Features
+
+**Performance Metrics:**
+
+- Returns: Total, annualized, monthly/yearly breakdowns
+- Risk: Sharpe ratio, Sortino ratio, max drawdown, volatility
+- Trade Stats: Win rate, profit factor, average win/loss
+- Benchmark Comparison: Compare against buy-and-hold and SPY
+
+**Agent Learning:**
+
+- The framework integrates with TradingAgents' reflection system
+- After each trade closes, agents learn from actual returns
+- Performance improves over the backtest period as agents adapt
+
+**Position Management:**
+
+- Multiple sizing strategies: percentage, fixed amount, all-in
+- Stop-loss and take-profit automation
+- Realistic commission and slippage modeling
+
+**Visualization:**
+
+- Equity curves with drawdown periods
+- Trade markers on price charts
+- Monthly returns heatmap
+- Comprehensive performance dashboard
+
+### Example Scripts
+
+We provide three example scripts in the `examples/` directory:
+
+1. **`simple_backtest.py`**: Basic single-ticker backtest
+2. **`portfolio_backtest.py`**: Multi-ticker portfolio with risk management
+3. **`advanced_backtest.py`**: Custom configuration with detailed analysis
+
+Run any example:
+
+```bash
+python examples/simple_backtest.py
+```
+
+### CLI Commands
+
+**Run a backtest:**
+
+```bash
+python -m cli.main backtest run
+```
+
+**Compare multiple tickers:**
+
+```bash
+python -m cli.main backtest compare "AAPL,GOOGL,MSFT" -s 2023-01-01 -e 2024-01-01
+```
+
+All backtest results are saved to `results/backtests/` with:
+
+- Performance metrics (JSON)
+- Trade history (CSV)
+- Agent decisions (CSV)
+- Visualizations (PNG)
+
 ## Contributing
 
 We welcome contributions from the community! Whether it's fixing a bug, improving documentation, or suggesting a new feature, your input helps make this project better. If you are interested in this line of research, please consider joining our open-source financial AI research community [Tauric Research](https://tauric.ai/).
 
 ## Citation
 
-Please reference our work if you find *TradingAgents* provides you with some help :)
+Please reference our work if you find _TradingAgents_ provides you with some help :)
 
 ```
 @misc{xiao2025tradingagentsmultiagentsllmfinancial,
-      title={TradingAgents: Multi-Agents LLM Financial Trading Framework}, 
+      title={TradingAgents: Multi-Agents LLM Financial Trading Framework},
       author={Yijia Xiao and Edward Sun and Di Luo and Wei Wang},
       year={2025},
       eprint={2412.20138},
       archivePrefix={arXiv},
       primaryClass={q-fin.TR},
-      url={https://arxiv.org/abs/2412.20138}, 
+      url={https://arxiv.org/abs/2412.20138},
 }
 ```
